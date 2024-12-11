@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c977994241ae29a4a979771221613fc9, type: 3}
   m_Name: GameFieldBuildSystem
   m_EditorClassIdentifier: 
-  _settings: {fileID: 11400000, guid: 40cf7146605befb4287b80c72b8cfd9c, type: 2}
+  _gameCardPrefab: {fileID: 9174044089549432280, guid: 482b75fbcb8559147a53730d7948fd76, type: 3}

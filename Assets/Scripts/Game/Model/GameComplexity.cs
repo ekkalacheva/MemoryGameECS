@@ -1,4 +1,4 @@
-﻿namespace  MemoryGame.Game
+﻿namespace MemoryGame.Game
 {
     public enum GameComplexity
     {

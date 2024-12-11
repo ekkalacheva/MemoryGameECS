@@ -6,10 +6,8 @@ using Scellecs.Morpeh;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
 using MemoryGame.Game;
+using Zenject;
 using Scellecs.Morpeh.Providers;
-using static UnityEditor.U2D.ScriptablePacker;
-using static UnityEngine.RuleTile.TilingRuleOutput;
-using System.Drawing;
 
 namespace  MemoryGame.GamePlay
 {
@@ -20,21 +18,32 @@ namespace  MemoryGame.GamePlay
     public sealed class GameFieldBuildSystem : UpdateSystem
     {
         [SerializeField]
-        private GamePlaySettings _settings;
+        private EntityProvider _gameCardPrefab;
 
+        private GamePlayModel _gamePlayModel;
+        private GameComplexityConfig _complexityConfig;
+        private GameFieldOffsets _gameFieldSettings;
         private GameField _gameField;
         private Camera _camera;
         private int _availableCardsAmount;
-
-        private readonly GameComplexity _complexity = GameComplexity.Easy; //TODO: change this
-
+        
+        [Inject]
+        private void Construct(GamePlayModel gamePlayModel,
+                               GameComplexityConfig complexityConfig,
+                               GameCardSprites gameCardSprites,
+                               GameFieldSettings gameFieldSettings)
+        {
+            _gamePlayModel = gamePlayModel;
+            _complexityConfig = complexityConfig;
+            _availableCardsAmount = gameCardSprites.Faces.Length;
+            _gameFieldSettings = gameFieldSettings.GetFieldSettings(_gamePlayModel.Complexity);
+        }
 
         public override void OnAwake()
         {
             var entity = World.Filter.With<GameField>().Build().First();
             _gameField = entity.GetComponent<GameField>();
             _camera = Camera.main;
-            _availableCardsAmount = _settings.GameCardSprites.Faces.Length;
 
             CreateGameField();
         }
@@ -46,8 +55,8 @@ namespace  MemoryGame.GamePlay
         private void CreateGameField()
         {
             var cardSize = CalculateCardSize();
-            var fieldSize = _settings.Complexity.GetFieldSize(_complexity);
-            var cardsOffset = _settings.GameField.GetFieldSettings(_complexity).CardsOffset;
+            var fieldSize = _complexityConfig.GetFieldSize(_gamePlayModel.Complexity);
+            var cardsOffset = _gameFieldSettings.CardsOffset;
 
             var startCardPositionX = -0.5f * (cardSize * (fieldSize.Columns - 1) + cardsOffset * (fieldSize.Columns - 1));
             var startCardPositionY = -0.5f * (cardSize * (fieldSize.Rows - 1) + cardsOffset * (fieldSize.Rows - 1));
@@ -65,8 +74,9 @@ namespace  MemoryGame.GamePlay
 
                     var cardModel = new GameCardModel(id);
 
-                    var cardInstance = Instantiate(_settings.CardPrefab);
+                    var cardInstance = Instantiate(_gameCardPrefab);
                     var gameCard = cardInstance.Entity.GetComponent<GameCard>();
+                    gameCard.Transform.SetParent(_gameField.Container,false);
                     gameCard.Transform.position = new Vector3(positionX, positionY, gameCard.Transform.position.z);
                     gameCard.Transform.localScale = new Vector3(cardSize, cardSize, gameCard.Transform.localScale.z);
                 }
@@ -77,10 +87,9 @@ namespace  MemoryGame.GamePlay
         {
             var cameraHeight = _camera.orthographicSize * 2;
             var cameraWidth = cameraHeight * _camera.aspect;
-            var gameFieldSettings = _settings.GameField.GetFieldSettings(_complexity);
-            var borderOffset = gameFieldSettings.BorderOffset;
-            var cardsOffset = gameFieldSettings.CardsOffset;
-            var fieldSize = _settings.Complexity.GetFieldSize(_complexity);
+            var borderOffset = _gameFieldSettings.BorderOffset;
+            var cardsOffset = _gameFieldSettings.CardsOffset;
+            var fieldSize = _complexityConfig.GetFieldSize(_gamePlayModel.Complexity);
 
             var cardWidth = (cameraWidth - 2 * borderOffset.x - (fieldSize.Columns - 1) * cardsOffset) / fieldSize.Columns;
             var cardHeight = (cameraHeight - 2 * borderOffset.y - (fieldSize.Rows - 1) * cardsOffset) / fieldSize.Rows;
@@ -97,7 +106,7 @@ namespace  MemoryGame.GamePlay
             {
                 availableCards.Add(i);
             }
-            var cardsAmount = _settings.Complexity.GetCardsAmount(_complexity);
+            var cardsAmount = _complexityConfig.GetCardsAmount(_gamePlayModel.Complexity);
             var cards = new int[cardsAmount];
             for (var i = 0; i < cardsAmount / 2; i++)
             {
