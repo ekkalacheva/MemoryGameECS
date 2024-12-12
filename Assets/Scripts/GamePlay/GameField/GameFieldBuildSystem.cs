@@ -65,7 +65,7 @@ namespace  MemoryGame.GamePlay
                     var positionY = startCardPositionY + i * (cardSize + cardsOffset);
 
                     var cardInstance = Instantiate(_gameCardPrefab);
-                    var gameCard = cardInstance.Entity.GetComponent<GameCard>();
+                    var gameCard = cardInstance.Entity.GetComponent<GameCardView>();
                     gameCard.Transform.SetParent(_gameField.Container,false);
                     gameCard.Transform.position = new Vector3(positionX, positionY, gameCard.Transform.position.z);
                     gameCard.Transform.localScale = new Vector3(cardSize, cardSize, gameCard.Transform.localScale.z);

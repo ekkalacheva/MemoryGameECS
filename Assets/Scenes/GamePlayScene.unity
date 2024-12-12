@@ -291,6 +291,10 @@ MonoBehaviour:
     system: {fileID: 11400000, guid: 0577769d8cb6ea34e98ca592f9d3cdec, type: 2}
   - enabled: 1
     system: {fileID: 11400000, guid: 9c70d1b1630f3f14c9268c1a6be445fb, type: 2}
+  - enabled: 1
+    system: {fileID: 11400000, guid: 416a1d493781fd4479f1e163ccd6c8de, type: 2}
+  - enabled: 1
+    system: {fileID: 11400000, guid: cdda28dd811d4a8488e5fab4a22cf860, type: 2}
   fixedUpdateSystems: []
   lateUpdateSystems: []
   cleanupSystems: []

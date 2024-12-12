@@ -9,11 +9,11 @@ namespace MemoryGame.GamePlay
     [Il2CppSetOption(Option.NullChecks, false)]
     [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
     [Il2CppSetOption(Option.DivideByZeroChecks, false)]
-    public sealed class GameCardProvider : MonoProvider<GameCard> {
+    public sealed class GameCardProvider : MonoProvider<GameCardView> {
     }
 
     [Serializable]
-    public struct GameCard : IComponent
+    public struct GameCardView : IComponent
     {
         public Transform Transform;
         public SpriteRenderer BackRenderer;

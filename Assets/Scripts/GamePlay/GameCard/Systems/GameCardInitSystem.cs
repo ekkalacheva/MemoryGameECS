@@ -35,7 +35,7 @@ namespace MemoryGame.GamePlay
 
         public override void OnAwake()
         {
-            _filter = World.Filter.With<GameCard>().Without<GameCardModel>().Build();
+            _filter = World.Filter.With<GameCardView>().Without<GameCardModel>().Build();
         }
 
         public override void OnUpdate(float deltaTime)
@@ -51,7 +51,7 @@ namespace MemoryGame.GamePlay
                 _cardIds.RemoveAt(0);
                 
                 cardEntity.AddComponent<GameCardModel>().Id = id;
-                var view = cardEntity.GetComponent<GameCard>();
+                var view = cardEntity.GetComponent<GameCardView>();
                 view.BackRenderer.sprite = _gameCardSprites.Back;
                 view.FaceRenderer.sprite = _gameCardSprites.Faces[id];
             }

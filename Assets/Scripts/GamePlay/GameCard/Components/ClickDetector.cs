@@ -5,6 +5,13 @@ namespace MemoryGame.GamePlay
 {
     internal class ClickDetector: MonoBehaviour
     {
+        private Action _listener;
+
+        public void Init(Action listener)
+        {
+            _listener = listener;
+        }
+
         private void OnEnable()
         {
             var colliders = GetComponentsInChildren<Collider2D>();
@@ -17,6 +24,7 @@ namespace MemoryGame.GamePlay
 
         private void OnMouseDown()
         {
+            _listener?.Invoke();
         }
     }
 }

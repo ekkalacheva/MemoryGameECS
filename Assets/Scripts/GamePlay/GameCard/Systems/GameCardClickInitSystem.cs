@@ -15,15 +15,19 @@ namespace MemoryGame.GamePlay
 
         public override void OnAwake()
         {
-            _filter = World.Filter.With<GameCard>().Without<Clickable>().Build();
+            _filter = World.Filter.With<GameCardView>().Without<Clickable>().Build();
         }
 
         public override void OnUpdate(float deltaTime)
         {
             foreach (var cardEntity in _filter)
             {
-                var view = cardEntity.GetComponent<GameCard>();
+                var view = cardEntity.GetComponent<GameCardView>();
                 var clickDetector = view.Transform.gameObject.AddComponent<ClickDetector>();
+                clickDetector.Init(() =>
+                {
+                    cardEntity.AddComponent<Clicked>();
+                });
                 cardEntity.AddComponent<Clickable>();
             }
         }
