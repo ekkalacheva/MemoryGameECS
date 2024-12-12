@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.IL2CPP.CompilerServices;
 using Scellecs.Morpeh;
 using Zenject;
+using System.Diagnostics;
 
 namespace MemoryGame.GamePlay
 {
@@ -15,11 +16,11 @@ namespace MemoryGame.GamePlay
     {
         private const float CardsHideDelaySeconds = 0.8f;
 
-        //TODO: create auto hide system
         [Inject] private ICoroutineHandler _coroutineHandler;
         private Coroutine _cardsCloseCoroutine;
 
         private Filter _filter;
+        private Event<RestartGameEvent> _restartGameEvent;
 
         private Entity _openedCard1;
         private Entity _openedCard2;
@@ -27,63 +28,80 @@ namespace MemoryGame.GamePlay
         public override void OnAwake()
         {
             _filter = World.Filter.With<GameCardView>().With<Clicked>().Build();
+            _restartGameEvent = World.GetEvent<RestartGameEvent>();
         }
 
         public override void OnUpdate(float deltaTime)
         {
             foreach (var card in _filter)
             {
-                card.RemoveComponent<Clicked>();
+                ProcessCardClick(card);
+            }
 
-                ref var model = ref card.GetComponent<GameCardModel>();
-                if (model.State == GameCardState.Collected || model.State == GameCardState.Opened)
-                {
-                    return;
-                }
+            foreach (var evt in _restartGameEvent.publishedChanges)
+            {
+                ClearActiveCards();
+            }
+        }
 
-                if (_openedCard1 == null)
-                {
-                    _openedCard1 = card;
-                    model.State = GameCardState.Opened;
-                    card.AddComponent<Opened>();
-                    CheckGameStart();
-                    return;
-                }
+        public override void Dispose()
+        {
+            base.Dispose();
+            ClearActiveCards();
+        }
 
-                if (_openedCard2 != null)
-                {
-                    return;
-                }
+        private void ProcessCardClick(Entity card)
+        {
+            card.RemoveComponent<Clicked>();
 
-                _openedCard2 = card;
+            ref var model = ref card.GetComponent<GameCardModel>();
+            if (model.State == GameCardState.Collected || model.State == GameCardState.Opened)
+            {
+                return;
+            }
+
+            if (_openedCard1 == null)
+            {
+                _openedCard1 = card;
                 model.State = GameCardState.Opened;
                 card.AddComponent<Opened>();
-                ref var firstCardModel = ref _openedCard1.GetComponent<GameCardModel>();
-                if (model.Id == firstCardModel.Id)
-                {
-                    firstCardModel.State = GameCardState.Collected;
-                    model.State = GameCardState.Collected;
-                    _openedCard1.AddComponent<Collected>();
-                    _openedCard2.AddComponent<Collected>();
-                    _openedCard1 = null;
-                    _openedCard2 = null;
-                    PairCardsCollected();
-                    return;
-                }
-
-                _cardsCloseCoroutine = _coroutineHandler.DelayAction(() =>
-                {
-                    ref var firstCardModel = ref _openedCard1.GetComponent<GameCardModel>();
-                    ref var secondCardModel = ref _openedCard2.GetComponent<GameCardModel>();
-                    firstCardModel.State = GameCardState.Closed;
-                    secondCardModel.State = GameCardState.Closed;
-                    _openedCard1.AddComponent<Closed>();
-                    _openedCard2.AddComponent<Closed>();
-                    _openedCard1 = null;
-                    _openedCard2 = null;
-                    _cardsCloseCoroutine = null;
-                }, CardsHideDelaySeconds);
+                CheckGameStart();
+                return;
             }
+
+            if (_openedCard2 != null)
+            {
+                return;
+            }
+
+            _openedCard2 = card;
+            model.State = GameCardState.Opened;
+            card.AddComponent<Opened>();
+            ref var firstCardModel = ref _openedCard1.GetComponent<GameCardModel>();
+            if (model.Id == firstCardModel.Id)
+            {
+                firstCardModel.State = GameCardState.Collected;
+                model.State = GameCardState.Collected;
+                _openedCard1.AddComponent<Collected>();
+                _openedCard2.AddComponent<Collected>();
+                _openedCard1 = null;
+                _openedCard2 = null;
+                PairCardsCollected();
+                return;
+            }
+
+            _cardsCloseCoroutine = _coroutineHandler.DelayAction(() =>
+            {
+                ref var firstCardModel = ref _openedCard1.GetComponent<GameCardModel>();
+                ref var secondCardModel = ref _openedCard2.GetComponent<GameCardModel>();
+                firstCardModel.State = GameCardState.Closed;
+                secondCardModel.State = GameCardState.Closed;
+                _openedCard1.AddComponent<Closed>();
+                _openedCard2.AddComponent<Closed>();
+                _openedCard1 = null;
+                _openedCard2 = null;
+                _cardsCloseCoroutine = null;
+            }, CardsHideDelaySeconds);
         }
 
         private void CheckGameStart()
@@ -102,6 +120,19 @@ namespace MemoryGame.GamePlay
             // {
             //     // _signals.TryFire<GamePlaySignals.GameCompleted>();
             // }
+        }
+
+        private void ClearActiveCards()
+        {
+            if (_cardsCloseCoroutine != null)
+            {
+                _coroutineHandler.StopCoroutine(_cardsCloseCoroutine);
+            }
+
+            _openedCard1 = null;
+            _openedCard2 = null;
+            // _gameStarted = false;
+            // _collectedCardsAmount = 0;
         }
     }
 }

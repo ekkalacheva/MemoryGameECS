@@ -54,6 +54,7 @@ namespace MemoryGame.GamePlay
                 var view = cardEntity.GetComponent<GameCardView>();
                 view.BackRenderer.sprite = _gameCardSprites.Back;
                 view.FaceRenderer.sprite = _gameCardSprites.Faces[id];
+                cardEntity.AddComponent<Closed>();
             }
         }
 
