@@ -98,6 +98,7 @@ GameObject:
   - component: {fileID: 1982350797725193080}
   - component: {fileID: 6694374468590538603}
   - component: {fileID: 1049323590793738782}
+  - component: {fileID: 4245933026872691496}
   m_Layer: 0
   m_Name: GameCard
   m_TagString: Untagged
@@ -184,6 +185,18 @@ MonoBehaviour:
     Transform: {fileID: 1982350797725193080}
     BackRenderer: {fileID: 123077124630020095}
     FaceRenderer: {fileID: 9219846758408647542}
+--- !u!114 &4245933026872691496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6156723011206546761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6004cc59c2c04afb96c6b6d42dad286c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8332797185045660436
 GameObject:
   m_ObjectHideFlags: 0
