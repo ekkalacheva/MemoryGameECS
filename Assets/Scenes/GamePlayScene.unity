@@ -297,6 +297,8 @@ MonoBehaviour:
     system: {fileID: 11400000, guid: cdda28dd811d4a8488e5fab4a22cf860, type: 2}
   - enabled: 1
     system: {fileID: 11400000, guid: d8c25c9ddb82b4341aaa3e91d9898dca, type: 2}
+  - enabled: 1
+    system: {fileID: 11400000, guid: e6c29f8a9d7b53b419cfa529be6b3299, type: 2}
   fixedUpdateSystems: []
   lateUpdateSystems: []
   cleanupSystems: []
@@ -311,6 +313,7 @@ GameObject:
   - component: {fileID: 1608162761}
   - component: {fileID: 1608162763}
   - component: {fileID: 1608162762}
+  - component: {fileID: 1608162764}
   m_Layer: 5
   m_Name: Timer
   m_TagString: Untagged
@@ -436,6 +439,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1608162760}
   m_CullTransparentMesh: 1
+--- !u!114 &1608162764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1608162760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16c01d1798104f84683af282e2bc5ce1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializedData:
+    Label: {fileID: 1608162762}
+    ElapsedSeconds: 0
 --- !u!1 &1705235236
 GameObject:
   m_ObjectHideFlags: 0

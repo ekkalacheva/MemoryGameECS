@@ -4,7 +4,7 @@ using UnityEngine;
 using Unity.IL2CPP.CompilerServices;
 using Scellecs.Morpeh;
 using Zenject;
-using System.Diagnostics;
+using MemoryGame.Game;
 
 namespace MemoryGame.GamePlay
 {
@@ -21,14 +21,28 @@ namespace MemoryGame.GamePlay
 
         private Filter _filter;
         private Event<RestartGameEvent> _restartGameEvent;
+        private Event<GameStartedEvent> _gameStartedEvent;
+        private Event<GameCompletedEvent> _gameCompletedEvent;
 
         private Entity _openedCard1;
         private Entity _openedCard2;
-        
+        private int _collectedCardsAmount;
+        private int _cardsAmount;
+        private bool _gameStarted;
+
+        [Inject]
+        private void Construct(GamePlayModel gamePlayModel,
+                               GameComplexityConfig complexityConfig)
+        {
+            _cardsAmount = complexityConfig.GetCardsAmount(gamePlayModel.Complexity);
+        }
+
         public override void OnAwake()
         {
             _filter = World.Filter.With<GameCardView>().With<Clicked>().Build();
             _restartGameEvent = World.GetEvent<RestartGameEvent>();
+            _gameStartedEvent = World.GetEvent<GameStartedEvent>();
+            _gameCompletedEvent = World.GetEvent<GameCompletedEvent>();
         }
 
         public override void OnUpdate(float deltaTime)
@@ -106,20 +120,20 @@ namespace MemoryGame.GamePlay
 
         private void CheckGameStart()
         {
-            // if (!_gameStarted)
-            // {
-            //     _gameStarted = true;
-            //     // _signals.TryFire<GamePlaySignals.GameStarted>();
-            // }
+            if (!_gameStarted)
+            {
+                _gameStarted = true;
+                _gameStartedEvent.NextFrame(new GameStartedEvent());
+            }
         }
 
         private void PairCardsCollected()
         {
-            // _collectedCardsAmount += 2;
-            // if (_collectedCardsAmount == _cardsAmount)
-            // {
-            //     // _signals.TryFire<GamePlaySignals.GameCompleted>();
-            // }
+            _collectedCardsAmount += 2;
+            if (_collectedCardsAmount == _cardsAmount)
+            {
+                _gameCompletedEvent.NextFrame(new GameCompletedEvent());
+            }
         }
 
         private void ClearActiveCards()
@@ -131,8 +145,8 @@ namespace MemoryGame.GamePlay
 
             _openedCard1 = null;
             _openedCard2 = null;
-            // _gameStarted = false;
-            // _collectedCardsAmount = 0;
+            _gameStarted = false;
+            _collectedCardsAmount = 0;
         }
     }
 }
